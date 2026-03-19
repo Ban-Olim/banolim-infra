@@ -1,0 +1,54 @@
+services:
+    # 1. Nginx
+    nginx:
+        image: nginx:latest
+        container_name: nginx
+        restart: always
+        ports:
+            - "80:80"
+            - "443:443"
+        volumes:
+            - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+            - ./certbot/conf:/etc/letsencrypt
+            - ./certbot/www:/var/www/certbot
+        depends_on:
+            - spring-api
+        networks:
+            - banolim-network
+
+    # 2. Certbot
+    certbot:
+        image: certbot/certbot
+        container_name: certbot
+        volumes:
+            - ./certbot/conf:/etc/letsencrypt
+            - ./certbot/www:/var/www/certbot
+        entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12d & wait $${!}; done;'"
+        networks:
+            - banolim-network
+
+    # 3. Spring Boot
+    spring-api:
+        image: ${DOCKER_HUB_USERNAME}/banolim-spring:latest
+        container_name: spring-api
+        restart: always
+        env_file: .env
+        depends_on:
+            - fastapi-ai
+        networks:
+            - banolim-network
+
+    # 4. FastAPI
+    fastapi-ai:
+        image: ${DOCKER_HUB_USERNAME}/banolim-ai:latest
+        container_name: fastapi-ai
+        restart: always
+        environment:
+            - OPENAI_API_KEY=${OPENAI_API_KEY}
+            - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
+        networks:
+            - banolim-network
+
+networks:
+    banolim-network:
+        driver: bridge
