@@ -33,6 +33,11 @@ services:
         container_name: spring-api
         restart: always
         env_file: .env
+        environment:
+            - SPRING_DATASOURCE_URL=${DEPLOY_DB_URL}
+            - SPRING_DATASOURCE_USERNAME=${DEPLOY_DB_USERNAME}
+            - SPRING_DATASOURCE_PASSWORD=${DEPLOY_DB_PASSWORD}
+            - APP_FRONTEND_URL=${FRONTEND_URL}
         depends_on:
             - fastapi-ai
         networks:
