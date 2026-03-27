@@ -1,0 +1,86 @@
+name: Global Deployment (Infra)
+
+on:
+    # Spring / FastAPI 레포에서 보내는 신호를 받음
+    repository_dispatch:
+        types: [deploy-signal]
+    # 인프라 레포의 설정(docker-compose 등)이 직접 바뀌었을 때도 실행
+    push:
+        branches: ["main"]
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Infra code
+              uses: actions/checkout@v3
+
+            - name: Deploy to EC2 via SSH
+              uses: appleboy/ssh-action@master
+              with:
+                  host: ${{ secrets.SERVER_IP }}
+                  username: ${{ secrets.SERVER_USER }}
+                  key: ${{ secrets.SSH_PRIVATE_KEY }}
+                  # 1. GitHub Secrets에 등록된 모든 변수를 스크립트 내부로 전달
+                  envs: |
+                      DOCKER_HUB_USERNAME,
+                      DEPLOY_DB_URL,
+                      DEPLOY_DB_USERNAME,
+                      DEPLOY_DB_PASSWORD,
+                      SPRING_JPA_HIBERNATE_DDL_AUTO,
+                      KAKAO_CLIENT_ID,
+                      KAKAO_CLIENT_SECRET,
+                      KAKAO_REDIRECT_URI,
+                      JWT_SECRET,
+                      JWT_EXPIRATION,
+                      FRONTEND_URL,
+                      OPENAI_API_KEY,
+                      CLAUDE_API_KEY,
+                      CHATBOT_ELEVENLABS_API_KEY,
+                      SENTENCE_ELEVENLABS_API_KEY,
+                      WORDBOOK_OPENAI_API_KEY,
+                      AWS_REGION,
+                      AWS_S3_BUCKET,
+                      NEO4J_URI,
+                      NEO4J_USERNAME,
+                      NEO4J_PASSWORD
+                  script: |
+                      # 2. 인프라 레포 폴더로 이동
+                      cd ~/banolim-infra || git clone https://github.com/Ban-Olim/banolim-infra.git ~/banolim-infra && cd ~/banolim-infra
+
+                      # 3. 최신 docker-compose.yml 반영
+                      git pull origin main
+
+                      # 4. 실시간으로 .env 파일 생성 (환경 변수 주입의 핵심)
+                      # 기존 .env 삭제 후 새로 작성
+                      echo "DOCKER_HUB_USERNAME=$DOCKER_HUB_USERNAME" > .env
+                      echo "DEPLOY_DB_URL=$DEPLOY_DB_URL" >> .env
+                      echo "DEPLOY_DB_USERNAME=$DEPLOY_DB_USERNAME" >> .env
+                      echo "DEPLOY_DB_PASSWORD=$DEPLOY_DB_PASSWORD" >> .env
+                      echo "SPRING_JPA_HIBERNATE_DDL_AUTO=$SPRING_JPA_HIBERNATE_DDL_AUTO" >> .env
+                      echo "KAKAO_CLIENT_ID=$KAKAO_CLIENT_ID" >> .env
+                      echo "KAKAO_CLIENT_SECRET=$KAKAO_CLIENT_SECRET" >> .env
+                      echo "KAKAO_REDIRECT_URI=$KAKAO_REDIRECT_URI" >> .env
+                      echo "JWT_SECRET=$JWT_SECRET" >> .env
+                      echo "JWT_EXPIRATION=$JWT_EXPIRATION" >> .env
+                      echo "FRONTEND_URL=$FRONTEND_URL" >> .env
+                      echo "OPENAI_API_KEY=$OPENAI_API_KEY" >> .env
+                      echo "CLAUDE_API_KEY=$CLAUDE_API_KEY" >> .env
+                      echo "CHATBOT_ELEVENLABS_API_KEY=$CHATBOT_ELEVENLABS_API_KEY" >> .env
+                      echo "SENTENCE_ELEVENLABS_API_KEY=$SENTENCE_ELEVENLABS_API_KEY" >> .env
+                      echo "WORDBOOK_OPENAI_API_KEY=$WORDBOOK_OPENAI_API_KEY" >> .env
+                      echo "AWS_REGION=$AWS_REGION" >> .env
+                      echo "AWS_S3_BUCKET=$AWS_S3_BUCKET" >> .env
+                      echo "NEO4J_URI=$NEO4J_URI" >> .env
+                      echo "NEO4J_USERNAME=$NEO4J_USERNAME" >> .env
+                      echo "NEO4J_PASSWORD=$NEO4J_PASSWORD" >> .env
+
+                      # 5. 도커 허브 로그인 (Private 이미지일 경우 필요)
+                      # echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
+
+                      # 6. 배포 실행
+                      docker compose pull
+                      docker compose up -d --remove-orphans
+
+                      # 7. 정리
+                      docker image prune -f
