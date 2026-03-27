@@ -33,16 +33,36 @@ services:
         container_name: spring-api
         restart: always
         environment:
+            # Database
             - SPRING_DATASOURCE_URL=${DEPLOY_DB_URL}
             - SPRING_DATASOURCE_USERNAME=${DEPLOY_DB_USERNAME}
             - SPRING_DATASOURCE_PASSWORD=${DEPLOY_DB_PASSWORD}
-            - APP_FRONTEND_URL=${FRONTEND_URL}
+            - SPRING_JPA_HIBERNATE_DDL_AUTO=${SPRING_JPA_HIBERNATE_DDL_AUTO}
+
+            # Security & JWT
             - JWT_SECRET=${JWT_SECRET}
+            - JWT_EXPIRATION=${JWT_EXPIRATION}
+            - jwt.expiration=${JWT_EXPIRATION}
+
+            # Frontend & API
+            - APP_FRONTEND_URL=${FRONTEND_URL}
+            - FASTAPI_BASE_URL=${FASTAPI_BASE_URL}
+
+            # Social Login (Kakao)
             - KAKAO_CLIENT_ID=${KAKAO_CLIENT_ID}
             - KAKAO_CLIENT_SECRET=${KAKAO_CLIENT_SECRET}
+            - KAKAO_REDIRECT_URI=${KAKAO_REDIRECT_URI}
 
-            # FastAPI 서비스 이름으로 연결 (도커 내부망)
-            - FASTAPI_BASE_URL={FASTAPI_BASE_URL}
+            # AWS S3
+            - AWS_REGION=${AWS_REGION}
+            - AWS_S3_BUCKET=${AWS_S3_BUCKET}
+            - app.aws.s3.bucket=${AWS_S3_BUCKET}
+
+            # Neo4j Graph DB
+            - SPRING_NEO4J_URI=${NEO4J_URI}
+            - SPRING_NEO4J_AUTHENTICATION_USERNAME=${NEO4J_USERNAME}
+            - SPRING_NEO4J_AUTHENTICATION_PASSWORD=${NEO4J_PASSWORD}
+
         depends_on:
             - fastapi-ai
         networks:
@@ -55,10 +75,12 @@ services:
         restart: always
         environment:
             - OPENAI_API_KEY=${OPENAI_API_KEY}
+            - CLAUDE_API_KEY=${CLAUDE_API_KEY}
             - CHATBOT_ELEVENLABS_API_KEY=${CHATBOT_ELEVENLABS_API_KEY}
             - SENTENCE_ELEVENLABS_API_KEY=${SENTENCE_ELEVENLABS_API_KEY}
-            - CLAUDE_API_KEY=${CLAUDE_API_KEY}
             - WORDBOOK_OPENAI_API_KEY=${WORDBOOK_OPENAI_API_KEY}
+            - AWS_REGION=${AWS_REGION}
+            - AWS_S3_BUCKET=${AWS_S3_BUCKET}
         networks:
             - banolim-network
 

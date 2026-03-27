@@ -1,10 +1,8 @@
 name: Global Deployment (Infra)
 
 on:
-    # Spring / FastAPI 레포에서 보내는 신호를 받음
     repository_dispatch:
         types: [deploy-signal]
-    # 인프라 레포의 설정(docker-compose 등)이 직접 바뀌었을 때도 실행
     push:
         branches: ["main"]
 
@@ -55,29 +53,13 @@ jobs:
                   host: ${{ secrets.SERVER_IP }}
                   username: ${{ secrets.SERVER_USER }}
                   key: ${{ secrets.SSH_PRIVATE_KEY }}
-                  # 전달할 환경 변수 목록 (쉼표 없이 줄바꿈으로 구분)
-                  envs: |
-                      DOCKER_HUB_USERNAME
-                      DEPLOY_DB_URL
-                      DEPLOY_DB_USERNAME
-                      DEPLOY_DB_PASSWORD
-                      SPRING_JPA_HIBERNATE_DDL_AUTO
-                      KAKAO_CLIENT_ID
-                      KAKAO_CLIENT_SECRET
-                      KAKAO_REDIRECT_URI
-                      JWT_SECRET
-                      JWT_EXPIRATION
-                      FRONTEND_URL
-                      OPENAI_API_KEY
-                      CLAUDE_API_KEY
-                      CHATBOT_ELEVENLABS_API_KEY
-                      SENTENCE_ELEVENLABS_API_KEY
-                      WORDBOOK_OPENAI_API_KEY
-                      AWS_REGION
-                      AWS_S3_BUCKET
-                      NEO4J_URI
-                      NEO4J_USERNAME
-                      NEO4J_PASSWORD
+                  envs: >-
+                      DOCKER_HUB_USERNAME,DEPLOY_DB_URL,DEPLOY_DB_USERNAME,DEPLOY_DB_PASSWORD,
+                      SPRING_JPA_HIBERNATE_DDL_AUTO,KAKAO_CLIENT_ID,KAKAO_CLIENT_SECRET,
+                      KAKAO_REDIRECT_URI,JWT_SECRET,JWT_EXPIRATION,FRONTEND_URL,OPENAI_API_KEY,
+                      CLAUDE_API_KEY,CHATBOT_ELEVENLABS_API_KEY,SENTENCE_ELEVENLABS_API_KEY,
+                      WORDBOOK_OPENAI_API_KEY,AWS_REGION,AWS_S3_BUCKET,NEO4J_URI,
+                      NEO4J_USERNAME,NEO4J_PASSWORD
                   script: |
                       # 1. 프로젝트 폴더로 이동 및 최신화
                       cd ~/banolim-infra || git clone https://github.com/Ban-Olim/banolim-infra.git ~/banolim-infra && cd ~/banolim-infra
@@ -89,6 +71,7 @@ jobs:
                       echo "DEBUG: DOCKER_HUB_USERNAME is [$DOCKER_HUB_USERNAME]"
 
                       # 2. .env 파일 생성 (환경 변수 주입)
+                      # 매번 새로 생성하기 위해 첫 줄은 > (덮어쓰기), 나머지는 >> (추가) 사용
                       echo "DOCKER_HUB_USERNAME=$DOCKER_HUB_USERNAME" > .env
                       echo "DEPLOY_DB_URL=$DEPLOY_DB_URL" >> .env
                       echo "DEPLOY_DB_USERNAME=$DEPLOY_DB_USERNAME" >> .env
