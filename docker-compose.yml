@@ -32,12 +32,17 @@ services:
         image: ${DOCKER_HUB_USERNAME}/banolim-spring:latest
         container_name: spring-api
         restart: always
-        env_file: .env
         environment:
             - SPRING_DATASOURCE_URL=${DEPLOY_DB_URL}
             - SPRING_DATASOURCE_USERNAME=${DEPLOY_DB_USERNAME}
             - SPRING_DATASOURCE_PASSWORD=${DEPLOY_DB_PASSWORD}
             - APP_FRONTEND_URL=${FRONTEND_URL}
+            - JWT_SECRET=${JWT_SECRET}
+            - KAKAO_CLIENT_ID=${KAKAO_CLIENT_ID}
+            - KAKAO_CLIENT_SECRET=${KAKAO_CLIENT_SECRET}
+
+            # FastAPI 서비스 이름으로 연결 (도커 내부망)
+            - FASTAPI_BASE_URL={FASTAPI_BASE_URL}
         depends_on:
             - fastapi-ai
         networks:
