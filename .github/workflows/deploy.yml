@@ -46,7 +46,7 @@ jobs:
                       NEO4J_PASSWORD
                   script: |
                       # 2. 인프라 레포 폴더로 이동
-                      cd ~/banolim-infra || git clone https://github.com/youserlol/banolim-infra.git ~/banolim-infra && cd ~/banolim-infra
+                      cd ~/banolim-infra || git clone https://github.com/Ban-Olim/banolim-infra.git ~/banolim-infra && cd ~/banolim-infra
 
                       # 3. 최신 docker-compose.yml 반영
                       git pull origin main
