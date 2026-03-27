@@ -95,6 +95,8 @@ jobs:
                       echo "NEO4J_URI=$NEO4J_URI" >> .env
                       echo "NEO4J_USERNAME=$NEO4J_USERNAME" >> .env
                       echo "NEO4J_PASSWORD=$NEO4J_PASSWORD" >> .env
+                      echo "SPRING_CLOUD_AWS_REGION_STATIC=$AWS_REGION" >> .env
+                      echo "SPRING_CLOUD_AWS_S3_BUCKET=$AWS_S3_BUCKET" >> .env
 
                       # 3. 배포 실행
                       docker compose pull
