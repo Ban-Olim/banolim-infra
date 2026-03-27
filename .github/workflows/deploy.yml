@@ -17,42 +17,64 @@ jobs:
 
             - name: Deploy to EC2 via SSH
               uses: appleboy/ssh-action@master
+              env:
+                  DOCKER_HUB_USERNAME: "${{ secrets.DOCKER_HUB_USERNAME }}"
+                  DEPLOY_DB_URL: "${{ secrets.DEPLOY_DB_URL }}"
+                  DEPLOY_DB_USERNAME: "${{ secrets.DEPLOY_DB_USERNAME }}"
+                  DEPLOY_DB_PASSWORD: "${{ secrets.DEPLOY_DB_PASSWORD }}"
+                  SPRING_JPA_HIBERNATE_DDL_AUTO: "${{ secrets.SPRING_JPA_HIBERNATE_DDL_AUTO }}"
+                  KAKAO_CLIENT_ID: "${{ secrets.KAKAO_CLIENT_ID }}"
+                  KAKAO_CLIENT_SECRET: "${{ secrets.KAKAO_CLIENT_SECRET }}"
+                  KAKAO_REDIRECT_URI: "${{ secrets.KAKAO_REDIRECT_URI }}"
+                  JWT_SECRET: "${{ secrets.JWT_SECRET }}"
+                  JWT_EXPIRATION: "${{ secrets.JWT_EXPIRATION }}"
+                  FRONTEND_URL: "${{ secrets.FRONTEND_URL }}"
+                  OPENAI_API_KEY: "${{ secrets.OPENAI_API_KEY }}"
+                  CLAUDE_API_KEY: "${{ secrets.CLAUDE_API_KEY }}"
+                  CHATBOT_ELEVENLABS_API_KEY: "${{ secrets.CHATBOT_ELEVENLABS_API_KEY }}"
+                  SENTENCE_ELEVENLABS_API_KEY: "${{ secrets.SENTENCE_ELEVENLABS_API_KEY }}"
+                  WORDBOOK_OPENAI_API_KEY: "${{ secrets.WORDBOOK_OPENAI_API_KEY }}"
+                  AWS_REGION: "${{ secrets.AWS_REGION }}"
+                  AWS_S3_BUCKET: "${{ secrets.AWS_S3_BUCKET }}"
+                  NEO4J_URI: "${{ secrets.NEO4J_URI }}"
+                  NEO4J_USERNAME: "${{ secrets.NEO4J_USERNAME }}"
+                  NEO4J_PASSWORD: "${{ secrets.NEO4J_PASSWORD }}"
               with:
                   host: ${{ secrets.SERVER_IP }}
                   username: ${{ secrets.SERVER_USER }}
                   key: ${{ secrets.SSH_PRIVATE_KEY }}
-                  # 1. GitHub Secrets에 등록된 모든 변수를 스크립트 내부로 전달
+                  # 전달할 환경 변수 목록 (쉼표 없이 줄바꿈으로 구분)
                   envs: |
-                      DOCKER_HUB_USERNAME,
-                      DEPLOY_DB_URL,
-                      DEPLOY_DB_USERNAME,
-                      DEPLOY_DB_PASSWORD,
-                      SPRING_JPA_HIBERNATE_DDL_AUTO,
-                      KAKAO_CLIENT_ID,
-                      KAKAO_CLIENT_SECRET,
-                      KAKAO_REDIRECT_URI,
-                      JWT_SECRET,
-                      JWT_EXPIRATION,
-                      FRONTEND_URL,
-                      OPENAI_API_KEY,
-                      CLAUDE_API_KEY,
-                      CHATBOT_ELEVENLABS_API_KEY,
-                      SENTENCE_ELEVENLABS_API_KEY,
-                      WORDBOOK_OPENAI_API_KEY,
-                      AWS_REGION,
-                      AWS_S3_BUCKET,
-                      NEO4J_URI,
-                      NEO4J_USERNAME,
+                      DOCKER_HUB_USERNAME
+                      DEPLOY_DB_URL
+                      DEPLOY_DB_USERNAME
+                      DEPLOY_DB_PASSWORD
+                      SPRING_JPA_HIBERNATE_DDL_AUTO
+                      KAKAO_CLIENT_ID
+                      KAKAO_CLIENT_SECRET
+                      KAKAO_REDIRECT_URI
+                      JWT_SECRET
+                      JWT_EXPIRATION
+                      FRONTEND_URL
+                      OPENAI_API_KEY
+                      CLAUDE_API_KEY
+                      CHATBOT_ELEVENLABS_API_KEY
+                      SENTENCE_ELEVENLABS_API_KEY
+                      WORDBOOK_OPENAI_API_KEY
+                      AWS_REGION
+                      AWS_S3_BUCKET
+                      NEO4J_URI
+                      NEO4J_USERNAME
                       NEO4J_PASSWORD
                   script: |
-                      # 2. 인프라 레포 폴더로 이동
+                      # 1. 프로젝트 폴더로 이동 및 최신화
                       cd ~/banolim-infra || git clone https://github.com/Ban-Olim/banolim-infra.git ~/banolim-infra && cd ~/banolim-infra
 
-                      # 3. 최신 docker-compose.yml 반영
+                      # 서버 로컬 변경 사항 강제 초기화 (충돌 방지)
+                      git reset --hard origin/main
                       git pull origin main
 
-                      # 4. 실시간으로 .env 파일 생성 (환경 변수 주입의 핵심)
-                      # 기존 .env 삭제 후 새로 작성
+                      # 2. .env 파일 생성 (환경 변수 주입)
                       echo "DOCKER_HUB_USERNAME=$DOCKER_HUB_USERNAME" > .env
                       echo "DEPLOY_DB_URL=$DEPLOY_DB_URL" >> .env
                       echo "DEPLOY_DB_USERNAME=$DEPLOY_DB_USERNAME" >> .env
@@ -75,12 +97,9 @@ jobs:
                       echo "NEO4J_USERNAME=$NEO4J_USERNAME" >> .env
                       echo "NEO4J_PASSWORD=$NEO4J_PASSWORD" >> .env
 
-                      # 5. 도커 허브 로그인 (Private 이미지일 경우 필요)
-                      # echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
-
-                      # 6. 배포 실행
+                      # 3. 배포 실행
                       docker compose pull
                       docker compose up -d --remove-orphans
 
-                      # 7. 정리
+                      # 4. 사용하지 않는 이미지 정리
                       docker image prune -f
