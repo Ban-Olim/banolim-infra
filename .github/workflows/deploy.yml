@@ -84,6 +84,7 @@ jobs:
                       echo "JWT_SECRET=$JWT_SECRET" >> .env
                       echo "JWT_EXPIRATION=$JWT_EXPIRATION" >> .env
                       echo "FRONTEND_URL=$FRONTEND_URL" >> .env
+                      echo "FASTAPI_BASE_URL=$FASTAPI_BASE_URL" >> .env
                       echo "OPENAI_API_KEY=$OPENAI_API_KEY" >> .env
                       echo "CLAUDE_API_KEY=$CLAUDE_API_KEY" >> .env
                       echo "CHATBOT_ELEVENLABS_API_KEY=$CHATBOT_ELEVENLABS_API_KEY" >> .env
