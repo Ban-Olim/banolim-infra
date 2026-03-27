@@ -74,6 +74,8 @@ jobs:
                       git reset --hard origin/main
                       git pull origin main
 
+                      echo "DEBUG: DOCKER_HUB_USERNAME is [$DOCKER_HUB_USERNAME]"
+
                       # 2. .env 파일 생성 (환경 변수 주입)
                       echo "DOCKER_HUB_USERNAME=$DOCKER_HUB_USERNAME" > .env
                       echo "DEPLOY_DB_URL=$DEPLOY_DB_URL" >> .env
