@@ -63,6 +63,7 @@ services:
 
             # AWS S3
             - SPRING_CLOUD_AWS_REGION_STATIC=${AWS_REGION}
+            - AWS_REGION=${AWS_REGION}
             - APP_AWS_S3_BUCKET=${AWS_S3_BUCKET}
             - AWS_S3_BUCKET=${AWS_S3_BUCKET}
             - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
