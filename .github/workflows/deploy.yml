@@ -14,70 +14,75 @@ jobs:
             id-token: write
 
         steps:
-            - name: Check Secrets Existence
-              run: |
-                  if [ -n "${{ secrets.DOCKER_HUB_USERNAME }}" ]; then
-                      echo "Secret exists!"
-                  else
-                      echo "Secret is MISSING!"
-                  fi
-
             - name: Checkout Infra code
               uses: actions/checkout@v3
 
             - name: Deploy to EC2 via SSH
               uses: appleboy/ssh-action@master
               env:
+                  # --- 기초 및 DB ---
                   DOCKER_HUB_USERNAME: "${{ secrets.DOCKER_HUB_USERNAME }}"
+                  SPRING_APPLICATION_NAME: "${{ secrets.SPRING_APPLICATION_NAME }}"
                   DEPLOY_DB_URL: "${{ secrets.DEPLOY_DB_URL }}"
                   DEPLOY_DB_USERNAME: "${{ secrets.DEPLOY_DB_USERNAME }}"
                   DEPLOY_DB_PASSWORD: "${{ secrets.DEPLOY_DB_PASSWORD }}"
                   SPRING_JPA_HIBERNATE_DDL_AUTO: "${{ secrets.SPRING_JPA_HIBERNATE_DDL_AUTO }}"
+                  SPRING_JPA_DATABASE_PLATFORM: "${{ secrets.SPRING_JPA_DATABASE_PLATFORM }}"
+
+                  # --- 보안 및 인증 ---
                   KAKAO_CLIENT_ID: "${{ secrets.KAKAO_CLIENT_ID }}"
                   KAKAO_CLIENT_SECRET: "${{ secrets.KAKAO_CLIENT_SECRET }}"
                   KAKAO_REDIRECT_URI: "${{ secrets.KAKAO_REDIRECT_URI }}"
                   JWT_SECRET: "${{ secrets.JWT_SECRET }}"
                   JWT_EXPIRATION: "${{ secrets.JWT_EXPIRATION }}"
-                  FASTAPI_BASE_URL: "${{ secrets.FASTAPI_BASE_URL }}"
+
+                  # --- 서비스 연동 ---
                   FRONTEND_URL: "${{ secrets.FRONTEND_URL }}"
+                  FASTAPI_BASE_URL: "${{ secrets.FASTAPI_BASE_URL }}"
+                  FASTAPI_TIMEOUT_MS: "${{ secrets.FASTAPI_TIMEOUT_MS }}"
+
+                  # --- AI API Keys ---
                   OPENAI_API_KEY: "${{ secrets.OPENAI_API_KEY }}"
                   CLAUDE_API_KEY: "${{ secrets.CLAUDE_API_KEY }}"
                   CHATBOT_ELEVENLABS_API_KEY: "${{ secrets.CHATBOT_ELEVENLABS_API_KEY }}"
                   SENTENCE_ELEVENLABS_API_KEY: "${{ secrets.SENTENCE_ELEVENLABS_API_KEY }}"
                   WORDBOOK_OPENAI_API_KEY: "${{ secrets.WORDBOOK_OPENAI_API_KEY }}"
+
+                  # --- AWS ---
                   AWS_REGION: "${{ secrets.AWS_REGION }}"
                   AWS_S3_BUCKET: "${{ secrets.AWS_S3_BUCKET }}"
+                  AWS_ACCESS_KEY_ID: "${{ secrets.AWS_ACCESS_KEY_ID }}"
+                  AWS_SECRET_ACCESS_KEY: "${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+
+                  # --- Graph DB ---
                   NEO4J_URI: "${{ secrets.NEO4J_URI }}"
                   NEO4J_USERNAME: "${{ secrets.NEO4J_USERNAME }}"
                   NEO4J_PASSWORD: "${{ secrets.NEO4J_PASSWORD }}"
+
               with:
                   host: ${{ secrets.SERVER_IP }}
                   username: ${{ secrets.SERVER_USER }}
                   key: ${{ secrets.SSH_PRIVATE_KEY }}
                   envs: >-
-                      DOCKER_HUB_USERNAME,DEPLOY_DB_URL,DEPLOY_DB_USERNAME,DEPLOY_DB_PASSWORD,
-                      SPRING_JPA_HIBERNATE_DDL_AUTO,KAKAO_CLIENT_ID,KAKAO_CLIENT_SECRET,
-                      KAKAO_REDIRECT_URI,JWT_SECRET,JWT_EXPIRATION,FRONTEND_URL,OPENAI_API_KEY,
-                      CLAUDE_API_KEY,CHATBOT_ELEVENLABS_API_KEY,SENTENCE_ELEVENLABS_API_KEY,
-                      WORDBOOK_OPENAI_API_KEY,AWS_REGION,AWS_S3_BUCKET,NEO4J_URI,
-                      NEO4J_USERNAME,NEO4J_PASSWORD,FASTAPI_BASE_URL
+                      DOCKER_HUB_USERNAME,SPRING_APPLICATION_NAME,DEPLOY_DB_URL,DEPLOY_DB_USERNAME,DEPLOY_DB_PASSWORD,
+                      SPRING_JPA_HIBERNATE_DDL_AUTO,SPRING_JPA_DATABASE_PLATFORM,KAKAO_CLIENT_ID,KAKAO_CLIENT_SECRET,
+                      KAKAO_REDIRECT_URI,JWT_SECRET,JWT_EXPIRATION,FRONTEND_URL,FASTAPI_BASE_URL,FASTAPI_TIMEOUT_MS,
+                      OPENAI_API_KEY,CLAUDE_API_KEY,CHATBOT_ELEVENLABS_API_KEY,SENTENCE_ELEVENLABS_API_KEY,
+                      WORDBOOK_OPENAI_API_KEY,AWS_REGION,AWS_S3_BUCKET,AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY,
+                      NEO4J_URI,NEO4J_USERNAME,NEO4J_PASSWORD
                   script: |
-                      # 1. 프로젝트 폴더로 이동 및 최신화
                       cd ~/banolim-infra || git clone https://github.com/Ban-Olim/banolim-infra.git ~/banolim-infra && cd ~/banolim-infra
-
-                      # 서버 로컬 변경 사항 강제 초기화 (충돌 방지)
                       git reset --hard origin/main
                       git pull origin main
 
-                      echo "DEBUG: DOCKER_HUB_USERNAME is [$DOCKER_HUB_USERNAME]"
-
-                      # 2. .env 파일 생성 (환경 변수 주입)
-                      # 매번 새로 생성하기 위해 첫 줄은 > (덮어쓰기), 나머지는 >> (추가) 사용
+                      # .env 파일 생성 (Properties와 이름 일치화)
                       echo "DOCKER_HUB_USERNAME=$DOCKER_HUB_USERNAME" > .env
+                      echo "SPRING_APPLICATION_NAME=$SPRING_APPLICATION_NAME" >> .env
                       echo "DEPLOY_DB_URL=$DEPLOY_DB_URL" >> .env
                       echo "DEPLOY_DB_USERNAME=$DEPLOY_DB_USERNAME" >> .env
                       echo "DEPLOY_DB_PASSWORD=$DEPLOY_DB_PASSWORD" >> .env
                       echo "SPRING_JPA_HIBERNATE_DDL_AUTO=$SPRING_JPA_HIBERNATE_DDL_AUTO" >> .env
+                      echo "SPRING_JPA_DATABASE_PLATFORM=$SPRING_JPA_DATABASE_PLATFORM" >> .env
                       echo "KAKAO_CLIENT_ID=$KAKAO_CLIENT_ID" >> .env
                       echo "KAKAO_CLIENT_SECRET=$KAKAO_CLIENT_SECRET" >> .env
                       echo "KAKAO_REDIRECT_URI=$KAKAO_REDIRECT_URI" >> .env
@@ -85,6 +90,7 @@ jobs:
                       echo "JWT_EXPIRATION=$JWT_EXPIRATION" >> .env
                       echo "FRONTEND_URL=$FRONTEND_URL" >> .env
                       echo "FASTAPI_BASE_URL=$FASTAPI_BASE_URL" >> .env
+                      echo "FASTAPI_TIMEOUT_MS=$FASTAPI_TIMEOUT_MS" >> .env
                       echo "OPENAI_API_KEY=$OPENAI_API_KEY" >> .env
                       echo "CLAUDE_API_KEY=$CLAUDE_API_KEY" >> .env
                       echo "CHATBOT_ELEVENLABS_API_KEY=$CHATBOT_ELEVENLABS_API_KEY" >> .env
@@ -92,15 +98,12 @@ jobs:
                       echo "WORDBOOK_OPENAI_API_KEY=$WORDBOOK_OPENAI_API_KEY" >> .env
                       echo "AWS_REGION=$AWS_REGION" >> .env
                       echo "AWS_S3_BUCKET=$AWS_S3_BUCKET" >> .env
+                      echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> .env
+                      echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> .env
                       echo "NEO4J_URI=$NEO4J_URI" >> .env
                       echo "NEO4J_USERNAME=$NEO4J_USERNAME" >> .env
                       echo "NEO4J_PASSWORD=$NEO4J_PASSWORD" >> .env
-                      echo "SPRING_CLOUD_AWS_REGION_STATIC=$AWS_REGION" >> .env
-                      echo "SPRING_CLOUD_AWS_S3_BUCKET=$AWS_S3_BUCKET" >> .env
 
-                      # 3. 배포 실행
                       docker compose pull
                       docker compose up -d --remove-orphans
-
-                      # 4. 사용하지 않는 이미지 정리
                       docker image prune -f

@@ -34,20 +34,26 @@ services:
         restart: always
         environment:
             - SPRING_PROFILES_ACTIVE=prod
-            # Database
+            - SPRING_APPLICATION_NAME=${SPRING_APPLICATION_NAME}
+
+            # Database (PostgreSQL)
             - SPRING_DATASOURCE_URL=${DEPLOY_DB_URL}
             - SPRING_DATASOURCE_USERNAME=${DEPLOY_DB_USERNAME}
             - SPRING_DATASOURCE_PASSWORD=${DEPLOY_DB_PASSWORD}
+            - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
+            - SPRING_JPA_DATABASE_PLATFORM=${SPRING_JPA_DATABASE_PLATFORM}
             - SPRING_JPA_HIBERNATE_DDL_AUTO=${SPRING_JPA_HIBERNATE_DDL_AUTO}
+            - SPRING_JPA_SHOW_SQL=${SPRING_JPA_SHOW_SQL}
+            - SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL=${SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL}
 
             # Security & JWT
             - JWT_SECRET=${JWT_SECRET}
             - JWT_EXPIRATION=${JWT_EXPIRATION}
-            - jwt.expiration=${JWT_EXPIRATION}
 
             # Frontend & API
             - APP_FRONTEND_URL=${FRONTEND_URL}
             - FASTAPI_BASE_URL=${FASTAPI_BASE_URL}
+            - FASTAPI_TIMEOUT_MS=${FASTAPI_TIMEOUT_MS}
 
             # Social Login (Kakao)
             - KAKAO_CLIENT_ID=${KAKAO_CLIENT_ID}
@@ -55,9 +61,10 @@ services:
             - KAKAO_REDIRECT_URI=${KAKAO_REDIRECT_URI}
 
             # AWS S3
-            - AWS_REGION=${AWS_REGION}
-            - AWS_S3_BUCKET=${AWS_S3_BUCKET}
-            - app.aws.s3.bucket=${AWS_S3_BUCKET}
+            - SPRING_CLOUD_AWS_REGION_STATIC=${AWS_REGION}
+            - APP_AWS_S3_BUCKET=${AWS_S3_BUCKET}
+            - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+            - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
 
             # Neo4j Graph DB
             - SPRING_NEO4J_URI=${NEO4J_URI}
