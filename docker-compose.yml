@@ -52,6 +52,7 @@ services:
 
             # Frontend & API
             - APP_FRONTEND_URL=${FRONTEND_URL}
+            - FRONTEND_URL=${FRONTEND_URL}
             - FASTAPI_BASE_URL=${FASTAPI_BASE_URL}
             - FASTAPI_TIMEOUT_MS=${FASTAPI_TIMEOUT_MS}
 
@@ -63,6 +64,7 @@ services:
             # AWS S3
             - SPRING_CLOUD_AWS_REGION_STATIC=${AWS_REGION}
             - APP_AWS_S3_BUCKET=${AWS_S3_BUCKET}
+            - AWS_S3_BUCKET=${AWS_S3_BUCKET}
             - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
             - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
 
