@@ -33,6 +33,7 @@ services:
         container_name: spring-api
         restart: always
         environment:
+            - SPRING_PROFILES_ACTIVE=prod
             # Database
             - SPRING_DATASOURCE_URL=${DEPLOY_DB_URL}
             - SPRING_DATASOURCE_USERNAME=${DEPLOY_DB_USERNAME}
