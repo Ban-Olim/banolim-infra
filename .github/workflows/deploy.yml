@@ -70,7 +70,7 @@ jobs:
                       KAKAO_REDIRECT_URI,JWT_SECRET,JWT_EXPIRATION,FRONTEND_URL,FASTAPI_BASE_URL,FASTAPI_TIMEOUT_MS,
                       OPENAI_API_KEY,CLAUDE_API_KEY,CHATBOT_ELEVENLABS_API_KEY,SENTENCE_ELEVENLABS_API_KEY,
                       WORDBOOK_OPENAI_API_KEY,AWS_REGION,AWS_S3_BUCKET,AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY,
-                      NEO4J_URI,NEO4J_USERNAME,NEO4J_PASSWORD
+                      NEO4J_URI,NEO4J_USERNAME,NEO4J_PASSWORD, SPRING_JPA_SHOW_SQL
                   script: |
                       cd ~/banolim-infra || git clone https://github.com/Ban-Olim/banolim-infra.git ~/banolim-infra && cd ~/banolim-infra
                       git reset --hard origin/main
