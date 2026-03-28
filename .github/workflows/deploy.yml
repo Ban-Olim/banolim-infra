@@ -28,6 +28,7 @@ jobs:
                   DEPLOY_DB_PASSWORD: "${{ secrets.DEPLOY_DB_PASSWORD }}"
                   SPRING_JPA_HIBERNATE_DDL_AUTO: "${{ secrets.SPRING_JPA_HIBERNATE_DDL_AUTO }}"
                   SPRING_JPA_DATABASE_PLATFORM: "${{ secrets.SPRING_JPA_DATABASE_PLATFORM }}"
+                  SPRING_JPA_SHOW_SQL: "${{ secrets.SPRING_JPA_SHOW_SQL }}"
 
                   # --- 보안 및 인증 ---
                   KAKAO_CLIENT_ID: "${{ secrets.KAKAO_CLIENT_ID }}"
