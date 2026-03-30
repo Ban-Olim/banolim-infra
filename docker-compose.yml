@@ -74,6 +74,10 @@ services:
             - SPRING_NEO4J_AUTHENTICATION_USERNAME=${NEO4J_USERNAME}
             - SPRING_NEO4J_AUTHENTICATION_PASSWORD=${NEO4J_PASSWORD}
 
+            # Nikl
+            - NIKL_API_URL=${NIKL_API_URL}
+            - NIKL_API_KEY=${NIKL_API_KEY}
+
         depends_on:
             - fastapi-ai
         networks:
