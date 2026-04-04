@@ -28,6 +28,9 @@ jobs:
                   DEPLOY_DB_PASSWORD: "${{ secrets.DEPLOY_DB_PASSWORD }}"
                   DB_HOST: "${{ secrets.DB_HOST }}"
                   DB_NAME: "${{ secrets.DB_NAME }}"
+                  DB_USER: "${{ secrets.DB_USER }}"
+                  DB_PASSWORD: "${{ secrets.DB_PASSWORD }}"
+                  DB_PORT: "${{ secrets.DB_PORT }}"
                   SPRING_JPA_HIBERNATE_DDL_AUTO: "${{ secrets.SPRING_JPA_HIBERNATE_DDL_AUTO }}"
                   SPRING_JPA_DATABASE_PLATFORM: "${{ secrets.SPRING_JPA_DATABASE_PLATFORM }}"
                   SPRING_JPA_SHOW_SQL: "${{ secrets.SPRING_JPA_SHOW_SQL }}"
@@ -77,7 +80,7 @@ jobs:
                       KAKAO_REDIRECT_URI,JWT_SECRET,JWT_EXPIRATION,FRONTEND_URL,FASTAPI_BASE_URL,FASTAPI_TIMEOUT_MS,
                       OPENAI_API_KEY,CLAUDE_API_KEY,CHATBOT_ELEVENLABS_API_KEY,SENTENCE_ELEVENLABS_API_KEY,
                       WORDBOOK_OPENAI_API_KEY,AWS_REGION,AWS_S3_BUCKET,AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY,
-                      NEO4J_URI,NEO4J_USERNAME,NEO4J_PASSWORD,SPRING_JPA_SHOW_SQL,SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL,NIKL_API_URL,NIKL_API_KEY,DB_HOST,DB_NAME
+                      NEO4J_URI,NEO4J_USERNAME,NEO4J_PASSWORD,SPRING_JPA_SHOW_SQL,SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL,NIKL_API_URL,NIKL_API_KEY,DB_HOST,DB_NAME,DB_USER,DB_PASSWORD,DB_PORT
                   script: |
                       cd ~/banolim-infra || git clone https://github.com/Ban-Olim/banolim-infra.git ~/banolim-infra && cd ~/banolim-infra
                       git reset --hard origin/main
@@ -117,6 +120,9 @@ jobs:
                       echo "NIKL_API_KEY=$NIKL_API_KEY" >> .env
                       echo "DB_HOST=$DB_HOST" >> .env
                       echo "DB_NAME=$DB_NAME" >> .env
+                      echo "DB_USER=$DB_USER" >> .env
+                      echo "DB_PASSWORD=$DB_PASSWORD" >> .env
+                      echo "DB_PORT=$DB_PORT" >> .env
 
                       docker compose pull
                       docker compose up -d --remove-orphans
