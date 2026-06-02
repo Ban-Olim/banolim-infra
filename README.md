@@ -134,7 +134,7 @@ FASTAPI_ENV=production
       <sub>Backend Developer</sub>
       <br />
       <br />
-      <span> AWS EC2 서버 구축 <br> Nginx 프록시 설정 <br> Docker Compose 환경 구축 <br> CI·CD 배포 자동화 AWS EC2 서버 구축 </span>
+      <span> AWS EC2 서버 구축 <br> Nginx 프록시 설정 <br> Docker Compose 환경 구축 <br> CI·CD 배포 자동화 </span>
     </td>
     <td align="center" width="220px">
       <a href="https://github.com/youserlol">
